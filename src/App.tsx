@@ -14,14 +14,14 @@ import {
   FileText
 } from "lucide-react";
 
-import Resume from './assets/cv.pdf';
-import ProfileImage from './assets/profile.jpg';
-import SamaPage from './assets/samaformpage.webp';
-import flexPage from './assets/flexibleeapage.webp';
-import Whatsapp from './assets/whatsapp.svg';
-import Gmail from './assets/gmail.svg';
-import Linkedin from './assets/linkedin.svg';
-import Github from './assets/github.svg';
+import resume from './assets/cv.pdf';
+import profileImage from './assets/profile.jpg';
+import samaformPage from './assets/samaformpage.webp';
+import flexibleeaPage from './assets/flexibleeapage.webp';
+import whatsapp from './assets/whatsapp.svg';
+import gmail from './assets/gmail.svg';
+import linkedin from './assets/linkedin.svg';
+import github from './assets/github.svg';
 import FlutterIcon from './assets/flutter.svg?react';
 import ERPNextIcon from './assets/Erpnext.svg?react';
 import JavascriptIcon from './assets/javascript.svg?react';
@@ -38,13 +38,11 @@ import NodejsIcon from './assets/nodejs.svg?react';
 
 const SocialsMenu = () => {
   const { scrollYProgress, scrollY } = useScroll();
-  const lineHeight = useTransform(
+  const scaleY = useTransform(
     [scrollY, scrollYProgress],
     ([latestY, latestProgress]: [number, number]) => {
-      if (latestY < 0) {
-        return Math.max(15, 80 + latestY * 0.75);
-      }
-      return 80 + latestProgress * 250;
+      if (latestY < 0) return 0.05;
+        return Math.min(1, 0.2 + latestProgress * 0.75);
     }
   );
   const [isScrolled, setIsScrolled] = useState(false);
@@ -61,26 +59,26 @@ const SocialsMenu = () => {
   const shouldHideIcons = isScrolled && isMobile;
   const socials = [
     {
-      icon: <img src={Whatsapp} alt="Contact" className="w-5 h-5 md:w-7 md:h-7" />,
+      icon: <img src={whatsapp} alt="Contact" className="w-5 h-5 md:w-7 md:h-7" />,
       href: "https://wa.me/967733794400",
       target: "_blank",
       rel: "noopener noreferrer",
       bg: "bg-green-500"
     },
     {
-      icon: <img src={Gmail} alt="Gmail" className="w-5 h-5 md:w-7 md:h-7" />,
+      icon: <img src={gmail} alt="Gmail" className="w-5 h-5 md:w-7 md:h-7" />,
       href: "mailto:esmaeelf007@gmail.com",
       bg: "bg-white"
     },
     {
-      icon: <img src={Linkedin} alt="LinkedIn" className="w-5 h-5 md:w-8 md:h-8 object-contain brightness-0 invert" />,
+      icon: <img src={linkedin} alt="LinkedIn" className="w-5 h-5 md:w-8 md:h-8 object-contain brightness-0 invert" />,
       href: "https://www.linkedin.com/in/esmail-alwahbani",
       target: "_blank",
       rel: "noopener noreferrer",
       bg: "bg-[#0b66c2]"
     },
     {
-      icon: <img src={Github} alt="GitHub" className="w-6 h-6 md:w-8 md:h-8 object-contain brightness-0 invert" />,
+      icon: <img src={github} alt="GitHub" className="w-6 h-6 md:w-8 md:h-8 object-contain brightness-0 invert" />,
       href: "https://github.com/esmailga",
       target: "_blank",
       rel: "noopener noreferrer",
@@ -117,8 +115,8 @@ const SocialsMenu = () => {
         ))}
       </div>
       <motion.div
-        style={{ height: lineHeight }}
-        className={`w-0.5 bg-[var(--muted)]/90 origin-top transition-transform duration-[1s] ease-[cubic-bezier(0.34,1.56,0.64,1)] ${shouldHideIcons ? "-translate-y-[220px]" : "translate-y-0"
+        style={{ scaleY }}
+        className={`w-0.5 h-[300px] bg-[var(--muted)]/90 origin-top transition-transform duration-[1s] ease-[cubic-bezier(0.34,1.56,0.64,1)] ${shouldHideIcons ? "-translate-y-[220px]" : "translate-y-0"
           }`}
       />
     </div>
@@ -184,7 +182,7 @@ export default function App() {
       desc: "Custom CMS and client portal for an architectural firm with complete website customization from admin dashboard.",
       techs: ["React", "Node.js", "PostgreSQL"],
       icon: <LayoutDashboard className="w-6 h-6" />,
-      image: SamaPage,
+      image: samaformPage,
       website: "https://samaform.com"
 
     },
@@ -195,21 +193,17 @@ export default function App() {
       desc: "Cross-platform job recruitment app tailored for freelancers.",
       techs: ["Flutter", "Dart", "C++"],
       icon: <Smartphone className="w-6 h-6" />,
-      image: flexPage,
+      image: flexibleeaPage,
       website: "https://github.com/esmailga/Flexibleea"
     }
   ];
 
   return (
     <div className="min-h-screen selection:bg-blue-500 selection:text-white" ref={containerRef}>
-      <div className="fixed inset-0 pointer-events-none -z-10">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-1/4 right-0 w-[400px] h-[400px] bg-blue-900/10 blur-[100px] rounded-full" />
-      </div>
-      <nav className="fixed top-0 w-full z-50 p-6 mix-blend-difference">
+      <nav className="fixed top-0 w-full z-50 p-6 bg-transparent md:mix-blend-difference">
         <div className="flex gap-4 items-center justify-end">
           <a
-            href={Resume}
+            href={resume}
             download
             className="px-5 py-2.5 flex bg-neutral-900/50 items-center backdrop-blur-md font-black text-white rounded-full hover:bg-red-500/70 transition-all hover:scale-105 shadow-xl shadow-white/10"
             title="Download CV"
@@ -273,7 +267,7 @@ export default function App() {
             <div className="order-1 md:order-2 flex justify-center md:justify-end">
               <div className="w-full max-w-[340px] aspect-square rounded-[3rem] overflow-hidden border-4 border-white/10 shadow-2xl">
                 <img
-                  src={ProfileImage}
+                  src={profileImage}
                   alt='profile'
                   className="w-full h-full object-cover"
                 />
