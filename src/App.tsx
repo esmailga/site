@@ -14,14 +14,14 @@ import {
   FileText
 } from "lucide-react";
 
-import resume from './assets/cv.pdf';
-import profileImage from './assets/profile.jpg';
-import samaformPage from './assets/samaformpage.webp';
-import flexibleeaPage from './assets/flexibleeapage.webp';
-import whatsapp from './assets/whatsapp.svg';
-import gmail from './assets/gmail.svg';
-import linkedin from './assets/linkedin.svg';
-import github from './assets/github.svg';
+import Resume from './assets/cv.pdf';
+import ProfileImage from './assets/profile.jpg';
+import SamaPage from './assets/samaformpage.webp';
+import flexPage from './assets/flexibleeapage.webp';
+import Whatsapp from './assets/whatsapp.svg';
+import Gmail from './assets/gmail.svg';
+import Linkedin from './assets/linkedin.svg';
+import Github from './assets/github.svg';
 import FlutterIcon from './assets/flutter.svg?react';
 import ERPNextIcon from './assets/Erpnext.svg?react';
 import JavascriptIcon from './assets/javascript.svg?react';
@@ -61,26 +61,26 @@ const SocialsMenu = () => {
   const shouldHideIcons = isScrolled && isMobile;
   const socials = [
     {
-      icon: <img src={whatsapp} alt="Contact" className="w-5 h-5 md:w-7 md:h-7" />,
+      icon: <img src={Whatsapp} alt="Contact" className="w-5 h-5 md:w-7 md:h-7" />,
       href: "https://wa.me/967733794400",
       target: "_blank",
       rel: "noopener noreferrer",
       bg: "bg-green-500"
     },
     {
-      icon: <img src={gmail} alt="Gmail" className="w-5 h-5 md:w-7 md:h-7" />,
+      icon: <img src={Gmail} alt="Gmail" className="w-5 h-5 md:w-7 md:h-7" />,
       href: "mailto:esmaeelf007@gmail.com",
       bg: "bg-white"
     },
     {
-      icon: <img src={linkedin} alt="LinkedIn" className="w-5 h-5 md:w-8 md:h-8 object-contain brightness-0 invert" />,
+      icon: <img src={Linkedin} alt="LinkedIn" className="w-5 h-5 md:w-8 md:h-8 object-contain brightness-0 invert" />,
       href: "https://www.linkedin.com/in/esmail-alwahbani",
       target: "_blank",
       rel: "noopener noreferrer",
       bg: "bg-[#0b66c2]"
     },
     {
-      icon: <img src={github} alt="GitHub" className="w-6 h-6 md:w-8 md:h-8 object-contain brightness-0 invert" />,
+      icon: <img src={Github} alt="GitHub" className="w-6 h-6 md:w-8 md:h-8 object-contain brightness-0 invert" />,
       href: "https://github.com/esmailga",
       target: "_blank",
       rel: "noopener noreferrer",
@@ -184,7 +184,7 @@ export default function App() {
       desc: "Custom CMS and client portal for an architectural firm with complete website customization from admin dashboard.",
       techs: ["React", "Node.js", "PostgreSQL"],
       icon: <LayoutDashboard className="w-6 h-6" />,
-      image: samaformPage,
+      image: SamaPage,
       website: "https://samaform.com"
 
     },
@@ -195,7 +195,7 @@ export default function App() {
       desc: "Cross-platform job recruitment app tailored for freelancers.",
       techs: ["Flutter", "Dart", "C++"],
       icon: <Smartphone className="w-6 h-6" />,
-      image: flexibleeaPage,
+      image: flexPage,
       website: "https://github.com/esmailga/Flexibleea"
     }
   ];
@@ -209,7 +209,7 @@ export default function App() {
       <nav className="fixed top-0 w-full z-50 p-6 mix-blend-difference">
         <div className="flex gap-4 items-center justify-end">
           <a
-            href={resume}
+            href={Resume}
             download
             className="px-5 py-2.5 flex bg-neutral-900/50 items-center backdrop-blur-md font-black text-white rounded-full hover:bg-red-500/70 transition-all hover:scale-105 shadow-xl shadow-white/10"
             title="Download CV"
@@ -273,7 +273,7 @@ export default function App() {
             <div className="order-1 md:order-2 flex justify-center md:justify-end">
               <div className="w-full max-w-[340px] aspect-square rounded-[3rem] overflow-hidden border-4 border-white/10 shadow-2xl">
                 <img
-                  src={profileImage}
+                  src={ProfileImage}
                   alt='profile'
                   className="w-full h-full object-cover"
                 />
