@@ -14,7 +14,7 @@ import {
   FileText
 } from "lucide-react";
 
-import resume from './assets/cv.pdf';
+import resume from './assets/resume.pdf';
 import profileImage from './assets/profile.jpg';
 import samaformPage from './assets/samaformpage.webp';
 import flexibleeaPage from './assets/flexibleeapage.webp';
@@ -42,7 +42,7 @@ const SocialsMenu = () => {
     [scrollY, scrollYProgress],
     ([latestY, latestProgress]: [number, number]) => {
       if (latestY < 0) return 0.05;
-        return Math.min(1, 0.2 + latestProgress * 0.75);
+      return Math.min(1, 0.2 + latestProgress * 0.75);
     }
   );
   const [isScrolled, setIsScrolled] = useState(false);
@@ -145,7 +145,6 @@ const SectionHeading = ({ title }: { title: string }) => (
 );
 export default function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
-
   useLayoutEffect(() => {
     if (theme === 'light') {
       document.body.classList.add('light');
