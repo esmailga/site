@@ -205,14 +205,14 @@ export default function App() {
           <a
             href={resume}
             download
-            className="px-5 py-2.5 flex bg-neutral-900/50 items-center backdrop-blur-md font-black text-white rounded-full hover:bg-red-500/70 transition-all hover:scale-105 shadow-xl shadow-white/10"
+            className="px-5 py-2.5 flex bg-neutral-300/20 md:bg-neutral-900/50 items-center backdrop-blur-md font-black text-invert md:text-white rounded-full hover:bg-red-500/70 transition-all hover:scale-105 shadow-xl shadow-white/10"
             title="Download CV"
           >
             <FileText size={18} />
           </a>
           <motion.button
             onClick={toggleTheme}
-            className="p-3 rounded-full bg-neutral-900/50 backdrop-blur-md text-white shadow-xl shadow-white/10 relative flex items-center justify-center overflow-hidden"
+            className="p-3 rounded-full bg-neutral-300/20 md:bg-neutral-900/50 backdrop-blur-md text-invert md:text-white shadow-xl shadow-white/10 relative flex items-center justify-center overflow-hidden"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.85 }}
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
