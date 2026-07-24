@@ -60,7 +60,7 @@ const SocialsMenu = () => {
   const socials = [
     {
       icon: <img src={whatsapp} alt="Contact" className="w-5 h-5 md:w-7 md:h-7" />,
-      href: "https://wa.me/967733794400",
+      href: "https://wa.me/966553923781",
       target: "_blank",
       rel: "noopener noreferrer",
       bg: "bg-green-500"
