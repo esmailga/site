@@ -175,9 +175,20 @@ export default function App() {
 
   const projects = [
     {
-      title: "Samaform CMS",
+      title: "SaraBeauty",
       type: "Full Stack Development",
       year: "2026",
+      desc: "Custom CMS and client portal for an architectural firm with complete website customization from admin dashboard.",
+      techs: ["React", "Node.js", "PostgreSQL"],
+      icon: <LayoutDashboard className="w-6 h-6" />,
+      image: samaformPage,
+      website: "https://samaform.com"
+
+    },
+    {
+      title: "Samaform CMS",
+      type: "Full Stack Development",
+      year: "2025",
       desc: "Custom CMS and client portal for an architectural firm with complete website customization from admin dashboard.",
       techs: ["React", "Node.js", "PostgreSQL"],
       icon: <LayoutDashboard className="w-6 h-6" />,
@@ -322,7 +333,7 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { title: "Web/Backend", icons: <Code2 />, desc: "High-performance React systems and ERPNext integration." },
-              { title: "Industrial Ops", icons: <Cpu />, desc: "SCADA configuration and 120MWp substation protection systems." },
+              { title: "Machine Learning", icons: <Cpu />, desc: "Intrusion Detection model engineering and training." },
               { title: "Mobile Core", icons: <Smartphone />, desc: "Cross-platform engineering with Flutter and native C++ logic." }
             ].map((item, idx) => (
               <motion.div
