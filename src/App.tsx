@@ -179,7 +179,7 @@ export default function App() {
       title: "SaraBeauty",
       type: "Full Stack Development",
       year: "2026",
-      desc: "Website for an emerging beauty and care store with CRUD operations, real-time order tracking and centralized payment oversight from admin dashboard.",
+      desc: "Website for an emerging beauty and care store with CRUD operations, real-time order tracking, and centralized payment oversight from a secure admin dashboard.",
       techs: ["React", "Node.js", "MySQL", "PHP"],
       icon: <LayoutDashboard className="w-6 h-6" />,
       image: sarahbeautyPage,
