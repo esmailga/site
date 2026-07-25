@@ -16,6 +16,7 @@ import {
 
 import resume from './assets/resume.pdf';
 import profileImage from './assets/profile.jpg';
+import sarahbeautyPage from './assets/sarabeauty.webp';
 import samaformPage from './assets/samaformpage.webp';
 import flexibleeaPage from './assets/flexibleeapage.webp';
 import whatsapp from './assets/whatsapp.svg';
@@ -178,11 +179,11 @@ export default function App() {
       title: "SaraBeauty",
       type: "Full Stack Development",
       year: "2026",
-      desc: "Custom CMS and client portal for an architectural firm with complete website customization from admin dashboard.",
-      techs: ["React", "Node.js", "PostgreSQL"],
+      desc: "Website for an emerging beauty and care store with CRUD operations, real-time order tracking and centralized payment oversight from admin dashboard.",
+      techs: ["React", "Node.js", "MySQL", "PHP"],
       icon: <LayoutDashboard className="w-6 h-6" />,
-      image: samaformPage,
-      website: "https://samaform.com"
+      image: sarahbeautyPage,
+      website: "https://github.com/esmailga/beautySupplements"
 
     },
     {
@@ -190,7 +191,7 @@ export default function App() {
       type: "Full Stack Development",
       year: "2025",
       desc: "Custom CMS and client portal for an architectural firm with complete website customization from admin dashboard.",
-      techs: ["React", "Node.js", "PostgreSQL"],
+      techs: ["React", "Node.js", "PHP", "PostgreSQL"],
       icon: <LayoutDashboard className="w-6 h-6" />,
       image: samaformPage,
       website: "https://samaform.com"
