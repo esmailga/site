@@ -1,6 +1,5 @@
-import React from "react";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "motion/react";
-import { useRef, useState, useEffect, useLayoutEffect } from "react";
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent, useInView } from "motion/react";
+import { useRef, useState, useEffect, useLayoutEffect, type ReactNode } from "react";
 import {
   Code2,
   Smartphone,
@@ -11,14 +10,24 @@ import {
   ArrowUpRight,
   Sun,
   Moon,
-  FileText
+  FileText,
+  Globe
 } from "lucide-react";
 
 import resume from './assets/resume.pdf';
 import profileImage from './assets/profile.jpg';
 import sarahbeautyPage from './assets/sarabeauty.webp';
-import samaformPage from './assets/samaformpage.webp';
-import flexibleeaPage from './assets/flexibleeapage.webp';
+import samaformDesktop from './assets/samaform/desktop.webp';
+import samaformMobile from './assets/samaform/mobile.webp';
+import shamsDesktop from './assets/shams/desktop.webp';
+import shamsMobile from './assets/shams/mobile.webp';
+import flexExplore from './assets/flexibleea/explore.webp';
+import flexDetails from './assets/flexibleea/details.webp';
+import flexPeople from './assets/flexibleea/people.webp';
+import flexProfile from './assets/flexibleea/profile.webp';
+import flexListingForm from './assets/flexibleea/listing-form.webp';
+import flexExploreDark from './assets/flexibleea/explore-dark.webp';
+import flexAdmin from './assets/flexibleea/admin.webp';
 import whatsapp from './assets/whatsapp.svg';
 import gmail from './assets/gmail.svg';
 import linkedin from './assets/linkedin.svg';
@@ -36,12 +45,13 @@ import CppIcon from './assets/c-plus.svg?react';
 import PostgresqlIcon from './assets/postgresql.svg?react';
 import ReactIcon from './assets/react.svg?react';
 import NodejsIcon from './assets/nodejs.svg?react';
+import { IphoneFrame, MacbookFrame } from './components/DeviceFrames';
 
 const SocialsMenu = () => {
   const { scrollYProgress, scrollY } = useScroll();
   const scaleY = useTransform(
     [scrollY, scrollYProgress],
-    ([latestY, latestProgress]: [number, number]) => {
+    ([latestY, latestProgress]: number[]) => {
       if (latestY < 0) return 0.05;
       return Math.min(1, 0.2 + latestProgress * 0.75);
     }
@@ -144,6 +154,187 @@ const SectionHeading = ({ title }: { title: string }) => (
     </motion.div>
   </div>
 );
+
+type Screen = { title: string; image: string; desc: string };
+
+type Project = {
+  title: string;
+  type: string;
+  year: string;
+  desc: string;
+  techs: string[];
+  icon: ReactNode;
+  image: string;
+  website: string;
+  screens?: Screen[];
+  desktopImage?: string;
+};
+
+// Hover link, laid over a device screen.
+const ScreenOverlay = ({ project, children }: { project: Project; children: ReactNode }) => (
+  <div className="absolute inset-0">
+    {children}
+    <a
+      href={project.website}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="absolute inset-0 bg-[var(--accent)]/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 cursor-pointer"
+    >
+      <div className="w-16 h-16 rounded-full bg-[var(--accent)] flex items-center justify-center text-white rotate-0 group-hover:rotate-12 transition-transform">
+        <ArrowUpRight className="w-8 h-8" />
+      </div>
+    </a>
+  </div>
+);
+
+const PhoneFrame = ({ project, className, children }: { project: Project; className: string; children: ReactNode }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 100 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: false, amount: 0.4 }}
+    transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+    className={`relative group ${className} aspect-[732/1410] shrink-0 drop-shadow-[0_25px_25px_rgba(0,0,0,0.35)]`}
+  >
+    <IphoneFrame>
+      <ScreenOverlay project={project}>{children}</ScreenOverlay>
+    </IphoneFrame>
+  </motion.div>
+);
+
+// MacBook with the phone layered over its corner, both showing the site. The lid swings open on first view.
+const DeviceStack = ({ project, desktopImage }: { project: Project; desktopImage: string }) => {
+  const stackRef = useRef<HTMLDivElement>(null);
+  const open = useInView(stackRef, { once: true, margin: "0px 0px -25% 0px" });
+
+  return (
+    <motion.div
+      ref={stackRef}
+      initial={{ opacity: 0, y: 100 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: false, amount: 0.4 }}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+      className="relative group w-full md:basis-3/5 pb-[3%]"
+    >
+      <div className="mr-[15%] drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]">
+        <MacbookFrame open={open}>
+          <ScreenOverlay project={project}>
+            <img
+              src={desktopImage}
+              alt={`${project.title} on desktop`}
+              className="absolute inset-0 w-full h-full object-cover object-top opacity-85"
+            />
+          </ScreenOverlay>
+        </MacbookFrame>
+      </div>
+      <a
+        href={project.website}
+        target="_blank"
+        rel="noopener noreferrer"
+        tabIndex={-1}
+        aria-hidden="true"
+        className="absolute bottom-0 -right-1 w-[26%] drop-shadow-[0_25px_25px_rgba(0,0,0,0.35)]"
+      >
+        <IphoneFrame>
+          <img src={project.image} alt="" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+        </IphoneFrame>
+      </a>
+    </motion.div>
+  );
+};
+
+// Pins the phone while the section scrolls past, stepping through one screen per slice of scroll.
+const ScreenTour = ({ project, screens, isEven }: { project: Project; screens: Screen[]; isEven: boolean }) => {
+  const tourRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: tourRef, offset: ["start start", "end end"] });
+  const [active, setActive] = useState(0);
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    setActive(Math.min(screens.length - 1, Math.floor(latest * screens.length)));
+  });
+  const screen = screens[active];
+
+  return (
+    <div ref={tourRef} className="relative" style={{ height: `${screens.length * 60 + 100}vh` }}>
+      <div
+        className={`sticky top-0 h-svh flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"
+          } items-center justify-center gap-4 md:gap-24 pt-20 md:pt-0`}
+      >
+        <PhoneFrame
+          project={project}
+          className="h-[min(480px,calc(100svh-17rem))] md:h-[min(667px,calc(100svh-8rem))]"
+        >
+          {screens.map((s, i) => (
+            <motion.img
+              key={s.image}
+              src={s.image}
+              alt={`${project.title}: ${s.title}`}
+              aria-hidden={i !== active}
+              initial={false}
+              animate={{ opacity: i === active ? 0.85 : 0 }}
+              transition={{ duration: 0.5 }}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ))}
+        </PhoneFrame>
+        <motion.div
+          initial={{ opacity: 0, x: isEven ? 50 : -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: false, amount: 0.4 }}
+          transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="flex-1 max-w-xl text-center md:text-left"
+        >
+          <div className="flex flex-col md:flex-row items-center gap-6 mb-2 md:mb-6">
+            <div className="hidden md:flex w-12 h-12 rounded-2xl glossy-card shadow-sm overflow-hidden shrink-0 items-center justify-center p-2">
+              {project.icon}
+            </div>
+            <h3 className="text-2xl md:text-5xl font-black italic tracking-tighter">
+              {project.title}
+            </h3>
+          </div>
+
+          <div className="min-h-[6.5rem] md:min-h-[9rem]">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={active}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.25 }}
+              >
+                <p className="font-mono text-xs md:text-sm font-bold uppercase tracking-widest text-[var(--accent)] mb-2 md:mb-4">
+                  {screen.title}
+                </p>
+                <p className="text-sm md:text-lg text-[var(--muted)] leading-relaxed">
+                  {screen.desc}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <div className="flex gap-1.5 justify-center md:justify-start mt-3 md:mt-6" aria-hidden="true">
+            {screens.map((s, i) => (
+              <span
+                key={s.image}
+                className={`h-1 rounded-full transition-all duration-500 ${i === active ? "w-8 bg-[var(--accent)]" : "w-3 bg-[var(--muted)]/40"}`}
+              />
+            ))}
+          </div>
+
+          <div className="hidden md:flex flex-wrap gap-3 justify-start mt-8">
+            {project.techs.map((t) => (
+              <span
+                key={t}
+                className="px-4 py-2 glossy-card rounded-full text-xs font-bold text-[var(--muted)] uppercase transition-colors duration-500"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
 export default function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
   useLayoutEffect(() => {
@@ -174,7 +365,18 @@ export default function App() {
     { Icon: GitIcon, alt: 'Git' },
   ];
 
-  const projects = [
+  const projects: Project[] = [
+    {
+      title: "Shams Solutions",
+      type: "Full Stack Development",
+      year: "2026",
+      desc: "Bilingual English and Arabic website for an ERP and digital transformation company in Saudi Arabia. Server-rendered pages, interactive product demos, and a blog managed from a Firebase admin dashboard.",
+      techs: ["React", "TypeScript", "Express", "Firebase"],
+      icon: <Globe className="w-6 h-6" />,
+      image: shamsMobile,
+      desktopImage: shamsDesktop,
+      website: "https://shamss.io"
+    },
     {
       title: "SaraBeauty",
       type: "Full Stack Development",
@@ -190,10 +392,11 @@ export default function App() {
       title: "Samaform CMS",
       type: "Full Stack Development",
       year: "2025",
-      desc: "Custom CMS and client portal for an architectural firm with complete website customization from admin dashboard.",
+      desc: "Custom CMS and client portal for an architectural firm with complete website customization from admin dashboard. With dynamic client onboarding form to capture spatial design plans and project requirements using RESTful APIs to process multi-step form, image uploads, and store client data.",
       techs: ["React", "Node.js", "PHP", "PostgreSQL"],
       icon: <LayoutDashboard className="w-6 h-6" />,
-      image: samaformPage,
+      image: samaformMobile,
+      desktopImage: samaformDesktop,
       website: "https://samaform.com"
 
     },
@@ -204,8 +407,17 @@ export default function App() {
       desc: "Cross-platform job recruitment app tailored for freelancers.",
       techs: ["Flutter", "Dart", "C++"],
       icon: <Smartphone className="w-6 h-6" />,
-      image: flexibleeaPage,
-      website: "https://github.com/esmailga/Flexibleea"
+      image: flexExplore,
+      website: "https://github.com/esmailga/Flexibleea",
+      screens: [
+        { title: "Explore", image: flexExplore, desc: "A cross-platform marketplace for freelancers. The Explore feed shows open listings live, with search and category filters." },
+        { title: "Listing details", image: flexDetails, desc: "Each listing shows the freelancer's hourly rate, availability and reviews. Recruiters send requests through a prefilled email." },
+        { title: "People", image: flexPeople, desc: "A directory of every member, searchable by name or email. Tap anyone to open their profile." },
+        { title: "Freelancer profile", image: flexProfile, desc: "Profiles gather a freelancer's listings and let recruiters reach them directly by WhatsApp, email or phone." },
+        { title: "Create / edit listing", image: flexListingForm, desc: "Freelancers set their own category, dates, working hours and hourly rate, with an optional qualification PDF." },
+        { title: "Dark mode", image: flexExploreDark, desc: "Material 3 design with light and dark themes, smooth page transitions and micro-interactions throughout." },
+        { title: "Admin console", image: flexAdmin, desc: "Admins rename or delete members, along with their listings, reviews and photos, and can remove any listing." },
+      ]
     }
   ];
 
@@ -292,8 +504,7 @@ export default function App() {
               transition={{ delay: 0.8 }}
               className="text-[var(--muted)] text-center text-lg md:text-xl font-medium leading-[1.3] md:leading-relaxed transition-colors duration-500 tracking-wide"
             >
-              Diverse expertise in bridging software technology with experience in ERP system development and exposure to high voltage substation protection systems and automation control.
-              Skilled in backend development, system integration, and web development.
+              Software developer with experience spanning full-stack web development and ERP systems with hands-on exposure to industrial power environments. One of my passions is connecting with people through my work, transforming their ideas into lasting, tangible experiences. A tenacious mentality and strong adaptability allow me to execute effectively in any environment, from fast-moving startups to structured engineering teams.
             </motion.p>
           </div>
         </div>
@@ -354,46 +565,29 @@ export default function App() {
         </section>
         <section id="works" className="mb-8 md:mb-30">
           <SectionHeading title="Projects" />
-          <div className="flex flex-col overflow-hidden">
+          <div className="flex flex-col overflow-x-clip -mx-6 px-6">
             {projects.map((project, idx) => {
               const isEven = idx % 2 === 0;
+              if (project.screens) {
+                return <ScreenTour key={idx} project={project} screens={project.screens} isEven={isEven} />;
+              }
               return (
                 <div
                   key={idx}
                   className={`flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"
                     } items-center justify-center min-h-[100vh] mt-8 md:mt-0 gap-12 md:gap-24`}
                 >
-                  <motion.div
-                    initial={{ opacity: 0, y: 100 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: false, amount: 0.4 }}
-                    transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative group w-[230px] md:w-[310px] h-[480px] md:h-[667px] rounded-[3.5rem] shrink-0 overflow-hidden border-[9px] border-black bg-black shadow-[0_0_0_2px_#3f3f46,0_0_0_4px_#18181b,0_25px_40px_-14px_rgba(0,0,0,0.7)]"
-                  >
-                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-22 h-5 bg-black rounded-full z-20" />
-                    <div className="relative w-full h-full bg-[var(--card)] overflow-hidden">
+                  {project.desktopImage ? (
+                    <DeviceStack project={project} desktopImage={project.desktopImage} />
+                  ) : (
+                    <PhoneFrame project={project} className="h-[480px] md:h-[667px]">
                       <img
                         src={project.image}
                         alt={project.title}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-85"
+                        className="absolute inset-0 w-full h-full object-cover opacity-85"
                       />
-                      <div className="absolute bottom-8 left-2 z-10">
-                        <span className="font-mono text-[0.5rem] md:text-[0.7rem] font-bold text-white tracking-widest bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                          {project.year} // {project.type}
-                        </span>
-                      </div>
-                      <a
-                        href={project.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute inset-0 bg-[var(--accent)]/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 cursor-pointer"
-                      >
-                        <div className="w-16 h-16 rounded-full bg-[var(--accent)] flex items-center justify-center text-white rotate-0 group-hover:rotate-12 transition-transform">
-                          <ArrowUpRight className="w-8 h-8" />
-                        </div>
-                      </a>
-                    </div>
-                  </motion.div>
+                    </PhoneFrame>
+                  )}
                   <motion.div
                     initial={{ opacity: 0, x: isEven ? 50 : -50 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -511,7 +705,7 @@ export default function App() {
             <p className="font-mono text-[10px] text-[var(--muted)] font-bold uppercase transition-colors duration-500"> // Software Dev</p>
           </div>
           <div className="flex flex-col items-center md:items-end gap-2 text-[var(--muted)] font-medium text-sm transition-colors duration-500">
-            <p>© 2025</p>
+            <p>© 2026</p>
           </div>
         </div>
       </footer>
