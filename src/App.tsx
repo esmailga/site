@@ -11,7 +11,8 @@ import {
   Sun,
   Moon,
   FileText,
-  Globe
+  Globe,
+  Droplet
 } from "lucide-react";
 
 import resume from './assets/resume.pdf';
@@ -19,6 +20,12 @@ import profileImage from './assets/profile.jpg';
 import sarahbeautyPage from './assets/sarabeauty.webp';
 import samaformDesktop from './assets/samaform/desktop.webp';
 import samaformMobile from './assets/samaform/mobile.webp';
+import samaformProjectsDesktop from './assets/samaform/projects-desktop.webp';
+import samaformProjectsMobile from './assets/samaform/projects-mobile.webp';
+import samaformFormDesktop from './assets/samaform/form-desktop.webp';
+import samaformFormMobile from './assets/samaform/form-mobile.webp';
+import samaformResponsesDesktop from './assets/samaform/responses-desktop.webp';
+import samaformResponsesMobile from './assets/samaform/responses-mobile.webp';
 import shamsDesktop from './assets/shams/desktop.webp';
 import shamsMobile from './assets/shams/mobile.webp';
 import flexExplore from './assets/flexibleea/explore.webp';
@@ -28,6 +35,9 @@ import flexProfile from './assets/flexibleea/profile.webp';
 import flexListingForm from './assets/flexibleea/listing-form.webp';
 import flexExploreDark from './assets/flexibleea/explore-dark.webp';
 import flexAdmin from './assets/flexibleea/admin.webp';
+import wellUser from './assets/wellbooking/user.webp';
+import wellAdmin from './assets/wellbooking/admin.webp';
+import wellNotifications from './assets/wellbooking/notifications.webp';
 import whatsapp from './assets/whatsapp.svg';
 import gmail from './assets/gmail.svg';
 import linkedin from './assets/linkedin.svg';
@@ -155,7 +165,8 @@ const SectionHeading = ({ title }: { title: string }) => (
   </div>
 );
 
-type Screen = { title: string; image: string; desc: string };
+// `image` is the phone screen; `desktopImage` adds a MacBook screen for projects shown on both.
+type Screen = { title: string; image: string; desc: string; desktopImage?: string };
 
 type Project = {
   title: string;
@@ -165,7 +176,8 @@ type Project = {
   techs: string[];
   icon: ReactNode;
   image: string;
-  website: string;
+  // Without a website, the screens get no link or hover layer.
+  website?: string;
   screens?: Screen[];
   desktopImage?: string;
 };
@@ -174,16 +186,18 @@ type Project = {
 const ScreenOverlay = ({ project, children }: { project: Project; children: ReactNode }) => (
   <div className="absolute inset-0">
     {children}
-    <a
-      href={project.website}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="absolute inset-0 bg-[var(--accent)]/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 cursor-pointer"
-    >
-      <div className="w-16 h-16 rounded-full bg-[var(--accent)] flex items-center justify-center text-white rotate-0 group-hover:rotate-12 transition-transform">
-        <ArrowUpRight className="w-8 h-8" />
-      </div>
-    </a>
+    {project.website && (
+      <a
+        href={project.website}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute inset-0 bg-[var(--accent)]/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 cursor-pointer"
+      >
+        <div className="w-16 h-16 rounded-full bg-[var(--accent)] flex items-center justify-center text-white rotate-0 group-hover:rotate-12 transition-transform">
+          <ArrowUpRight className="w-8 h-8" />
+        </div>
+      </a>
+    )}
   </div>
 );
 
@@ -201,8 +215,29 @@ const PhoneFrame = ({ project, className, children }: { project: Project; classN
   </motion.div>
 );
 
+// Stacked screen images that cross-fade to the active one.
+const FadeImages = ({ images, active, alts, className }: { images: string[]; active: number; alts: string[]; className: string }) => (
+  <>
+    {images.map((src, i) => (
+      <motion.img
+        key={`${i}-${src}`}
+        src={src}
+        alt={alts[i]}
+        aria-hidden={i !== active}
+        initial={false}
+        animate={{ opacity: i === active ? 0.85 : 0 }}
+        transition={{ duration: 0.5 }}
+        className={`absolute inset-0 w-full h-full object-cover ${className}`}
+      />
+    ))}
+  </>
+);
+
+type DeviceShot = { desktop: string; mobile: string; label: string };
+
 // MacBook with the phone layered over its corner, both showing the site. The lid swings open on first view.
-const DeviceStack = ({ project, desktopImage }: { project: Project; desktopImage: string }) => {
+// With several shots, both screens cross-fade together to `active`.
+const DeviceStack = ({ project, shots, active = 0 }: { project: Project; shots: DeviceShot[]; active?: number }) => {
   const stackRef = useRef<HTMLDivElement>(null);
   const open = useInView(stackRef, { once: true, margin: "0px 0px -25% 0px" });
 
@@ -218,10 +253,11 @@ const DeviceStack = ({ project, desktopImage }: { project: Project; desktopImage
       <div className="mr-[15%] drop-shadow-[0_25px_25px_rgba(0,0,0,0.25)]">
         <MacbookFrame open={open}>
           <ScreenOverlay project={project}>
-            <img
-              src={desktopImage}
-              alt={`${project.title} on desktop`}
-              className="absolute inset-0 w-full h-full object-cover object-top opacity-85"
+            <FadeImages
+              images={shots.map((s) => s.desktop)}
+              active={active}
+              alts={shots.map((s) => `${project.title} on desktop: ${s.label}`)}
+              className="object-top"
             />
           </ScreenOverlay>
         </MacbookFrame>
@@ -232,17 +268,18 @@ const DeviceStack = ({ project, desktopImage }: { project: Project; desktopImage
         rel="noopener noreferrer"
         tabIndex={-1}
         aria-hidden="true"
-        className="absolute bottom-0 -right-1 w-[26%] drop-shadow-[0_25px_25px_rgba(0,0,0,0.35)]"
+        className="absolute bottom-0 right-3 md:right-6 w-[26%] drop-shadow-[0_25px_25px_rgba(0,0,0,0.35)]"
       >
         <IphoneFrame>
-          <img src={project.image} alt="" className="absolute inset-0 w-full h-full object-cover opacity-85" />
+          <FadeImages images={shots.map((s) => s.mobile)} active={active} alts={shots.map(() => "")} className="" />
         </IphoneFrame>
       </a>
     </motion.div>
   );
 };
 
-// Pins the phone while the section scrolls past, stepping through one screen per slice of scroll.
+// Pins the device(s) while the section scrolls past, stepping through one screen per slice of scroll.
+// Projects with a desktop image show the MacBook and phone together; others show the phone alone.
 const ScreenTour = ({ project, screens, isEven }: { project: Project; screens: Screen[]; isEven: boolean }) => {
   const tourRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: tourRef, offset: ["start start", "end end"] });
@@ -258,23 +295,25 @@ const ScreenTour = ({ project, screens, isEven }: { project: Project; screens: S
         className={`sticky top-0 h-svh flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"
           } items-center justify-center gap-4 md:gap-24 pt-20 md:pt-0`}
       >
-        <PhoneFrame
-          project={project}
-          className="h-[min(480px,calc(100svh-17rem))] md:h-[min(667px,calc(100svh-8rem))]"
-        >
-          {screens.map((s, i) => (
-            <motion.img
-              key={s.image}
-              src={s.image}
-              alt={`${project.title}: ${s.title}`}
-              aria-hidden={i !== active}
-              initial={false}
-              animate={{ opacity: i === active ? 0.85 : 0 }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0 w-full h-full object-cover"
+        {project.desktopImage ? (
+          <DeviceStack
+            project={project}
+            active={active}
+            shots={screens.map((s) => ({ desktop: s.desktopImage ?? project.desktopImage!, mobile: s.image, label: s.title }))}
+          />
+        ) : (
+          <PhoneFrame
+            project={project}
+            className="h-[min(480px,calc(100svh-17rem))] md:h-[min(667px,calc(100svh-8rem))]"
+          >
+            <FadeImages
+              images={screens.map((s) => s.image)}
+              active={active}
+              alts={screens.map((s) => `${project.title}: ${s.title}`)}
+              className=""
             />
-          ))}
-        </PhoneFrame>
+          </PhoneFrame>
+        )}
         <motion.div
           initial={{ opacity: 0, x: isEven ? 50 : -50 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -378,17 +417,6 @@ export default function App() {
       website: "https://shamss.io"
     },
     {
-      title: "SaraBeauty",
-      type: "Full Stack Development",
-      year: "2026",
-      desc: "Website for an emerging beauty and care store with CRUD operations, real-time order tracking, and centralized payment oversight from a secure admin dashboard.",
-      techs: ["React", "Node.js", "MySQL", "PHP"],
-      icon: <LayoutDashboard className="w-6 h-6" />,
-      image: sarahbeautyPage,
-      website: "https://github.com/esmailga/beautySupplements"
-
-    },
-    {
       title: "Samaform CMS",
       type: "Full Stack Development",
       year: "2025",
@@ -397,8 +425,36 @@ export default function App() {
       icon: <LayoutDashboard className="w-6 h-6" />,
       image: samaformMobile,
       desktopImage: samaformDesktop,
-      website: "https://samaform.com"
-
+      website: "https://samaform.com",
+      screens: [
+        { title: "Website", image: samaformMobile, desktopImage: samaformDesktop, desc: "Custom CMS and client portal for an architectural firm with complete website customization from admin dashboard. With dynamic client onboarding form to capture spatial design plans and project requirements using RESTful APIs to process multi-step form, image uploads, and store client data." },
+        { title: "Admin: projects", image: samaformProjectsMobile, desktopImage: samaformProjectsDesktop, desc: "The firm adds, edits and removes the projects shown on the site, each with an English and Arabic name, a category and a photo." },
+        { title: "Admin: form editor", image: samaformFormMobile, desktopImage: samaformFormDesktop, desc: "The onboarding form is edited from the dashboard: steps, questions, answer types and bilingual options, published as versions so older responses keep their labels." },
+        { title: "Admin: responses", image: samaformResponsesMobile, desktopImage: samaformResponsesDesktop, desc: "Every client inquiry in one table, with the full answers and uploaded images on click, and export to Excel or a branded PDF." },
+      ]
+    },
+    {
+      title: "Well Irrigation Booking System",
+      type: "Full Stack Development",
+      year: "2026",
+      desc: "Arabic booking system for hours on a shared irrigation well, with payment-proof review and per-farm limits.",
+      techs: ["PHP", "SQLite", "JavaScript"],
+      icon: <Droplet className="w-6 h-6" />,
+      image: wellUser,
+      screens: [
+        { title: "Farmer booking", image: wellUser, desc: "Farmers pick a date and free hours for their farm, pay by bank transfer and upload a photo of the receipt. No account or password: the device remembers them." },
+        { title: "Admin dashboard", image: wellAdmin, desc: "Admins sign in with two-factor codes, review payment proofs, and see today's schedule, duplicate-receipt flags and abuse alerts at a glance." },
+        { title: "Phone notifications", image: wellNotifications, desc: "Each new payment proof pushes a notification to every admin's phone with the farm, date, hours and amount, and warns when a receipt image has been used before." },
+      ]
+    },
+    {
+      title: "SaraBeauty",
+      type: "Full Stack Development",
+      year: "2026",
+      desc: "Website for an emerging beauty and care store with CRUD operations, real-time order tracking, and centralized payment oversight from a secure admin dashboard.",
+      techs: ["React", "Node.js", "MySQL", "PHP"],
+      icon: <LayoutDashboard className="w-6 h-6" />,
+      image: sarahbeautyPage,
     },
     {
       title: "Flexibleea",
@@ -578,7 +634,7 @@ export default function App() {
                     } items-center justify-center min-h-[100vh] mt-8 md:mt-0 gap-12 md:gap-24`}
                 >
                   {project.desktopImage ? (
-                    <DeviceStack project={project} desktopImage={project.desktopImage} />
+                    <DeviceStack project={project} shots={[{ desktop: project.desktopImage, mobile: project.image, label: project.title }]} />
                   ) : (
                     <PhoneFrame project={project} className="h-[480px] md:h-[667px]">
                       <img
