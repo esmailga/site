@@ -12,7 +12,8 @@ import {
   Moon,
   FileText,
   Globe,
-  Droplet
+  Droplet,
+  ShieldCheck
 } from "lucide-react";
 
 import resume from './assets/resume.pdf';
@@ -56,6 +57,7 @@ import PostgresqlIcon from './assets/postgresql.svg?react';
 import ReactIcon from './assets/react.svg?react';
 import NodejsIcon from './assets/nodejs.svg?react';
 import { IphoneFrame, MacbookFrame } from './components/DeviceFrames';
+import { idsSteps } from './components/IdsVisual';
 
 const SocialsMenu = () => {
   const { scrollYProgress, scrollY } = useScroll();
@@ -180,7 +182,25 @@ type Project = {
   website?: string;
   screens?: Screen[];
   desktopImage?: string;
+  // Replaces the device frames for projects without screens, e.g. research work.
+  visual?: ReactNode;
+  // A tour of illustrated cards instead of screenshots.
+  visualScreens?: VisualScreen[];
 };
+
+type VisualScreen = { title: string; desc: string; visual: ReactNode };
+
+// Shown when a project has no device frame to carry the link.
+const CodeLink = ({ href }: { href: string }) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[var(--accent)] text-white text-xs md:text-sm font-bold uppercase hover:gap-3 transition-all"
+  >
+    View the code <ArrowUpRight className="w-4 h-4" />
+  </a>
+);
 
 // Hover link, laid over a device screen.
 const ScreenOverlay = ({ project, children }: { project: Project; children: ReactNode }) => (
@@ -278,9 +298,56 @@ const DeviceStack = ({ project, shots, active = 0 }: { project: Project; shots: 
   );
 };
 
-// Pins the device(s) while the section scrolls past, stepping through one screen per slice of scroll.
-// Projects with a desktop image show the MacBook and phone together; others show the phone alone.
-const ScreenTour = ({ project, screens, isEven }: { project: Project; screens: Screen[]; isEven: boolean }) => {
+// Screenshots for the tour. Projects with a desktop image show the MacBook and phone together; others show the phone alone.
+const DeviceTourStage = ({ project, screens, active }: { project: Project; screens: Screen[]; active: number }) =>
+  project.desktopImage ? (
+    <DeviceStack
+      project={project}
+      active={active}
+      shots={screens.map((s) => ({ desktop: s.desktopImage ?? project.desktopImage!, mobile: s.image, label: s.title }))}
+    />
+  ) : (
+    <PhoneFrame
+      project={project}
+      className="h-[min(480px,calc(100svh-17rem))] md:h-[min(667px,calc(100svh-8rem))]"
+    >
+      <FadeImages
+        images={screens.map((s) => s.image)}
+        active={active}
+        alts={screens.map((s) => `${project.title}: ${s.title}`)}
+        className=""
+      />
+    </PhoneFrame>
+  );
+
+// Illustrated cards for the tour, cross-fading to the active one.
+const CardTourStage = ({ screens, active }: { screens: VisualScreen[]; active: number }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 100 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: false, amount: 0.4 }}
+    transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+    className="relative w-full max-w-[420px] shrink-0 h-[min(400px,calc(100svh-22rem))] md:h-[min(560px,calc(100svh-8rem))]"
+  >
+    {screens.map((s, i) => (
+      <motion.div
+        key={s.title}
+        aria-hidden={i !== active}
+        initial={false}
+        animate={{ opacity: i === active ? 1 : 0, scale: i === active ? 1 : 0.97 }}
+        transition={{ duration: 0.5 }}
+        className={`absolute inset-0 ${i === active ? "" : "pointer-events-none"}`}
+      >
+        {s.visual}
+      </motion.div>
+    ))}
+  </motion.div>
+);
+
+type TourStep = { title: string; desc: string };
+
+// Pins the stage while the section scrolls past, stepping through one screen per slice of scroll.
+const ScreenTour = ({ project, screens, stage, isEven }: { project: Project; screens: TourStep[]; stage: (active: number) => ReactNode; isEven: boolean }) => {
   const tourRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: tourRef, offset: ["start start", "end end"] });
   const [active, setActive] = useState(0);
@@ -295,25 +362,7 @@ const ScreenTour = ({ project, screens, isEven }: { project: Project; screens: S
         className={`sticky top-0 h-svh flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"
           } items-center justify-center gap-4 md:gap-24 pt-20 md:pt-0`}
       >
-        {project.desktopImage ? (
-          <DeviceStack
-            project={project}
-            active={active}
-            shots={screens.map((s) => ({ desktop: s.desktopImage ?? project.desktopImage!, mobile: s.image, label: s.title }))}
-          />
-        ) : (
-          <PhoneFrame
-            project={project}
-            className="h-[min(480px,calc(100svh-17rem))] md:h-[min(667px,calc(100svh-8rem))]"
-          >
-            <FadeImages
-              images={screens.map((s) => s.image)}
-              active={active}
-              alts={screens.map((s) => `${project.title}: ${s.title}`)}
-              className=""
-            />
-          </PhoneFrame>
-        )}
+        {stage(active)}
         <motion.div
           initial={{ opacity: 0, x: isEven ? 50 : -50 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -352,7 +401,7 @@ const ScreenTour = ({ project, screens, isEven }: { project: Project; screens: S
           <div className="flex gap-1.5 justify-center md:justify-start mt-3 md:mt-6" aria-hidden="true">
             {screens.map((s, i) => (
               <span
-                key={s.image}
+                key={s.title}
                 className={`h-1 rounded-full transition-all duration-500 ${i === active ? "w-8 bg-[var(--accent)]" : "w-3 bg-[var(--muted)]/40"}`}
               />
             ))}
@@ -368,6 +417,12 @@ const ScreenTour = ({ project, screens, isEven }: { project: Project; screens: S
               </span>
             ))}
           </div>
+
+          {project.visualScreens && project.website && (
+            <div className="mt-4 md:mt-8">
+              <CodeLink href={project.website} />
+            </div>
+          )}
         </motion.div>
       </div>
     </div>
@@ -415,6 +470,17 @@ export default function App() {
       image: shamsMobile,
       desktopImage: shamsDesktop,
       website: "https://shamss.io"
+    },
+    {
+      title: "IoT Intrusion Detection",
+      type: "Machine Learning Research",
+      year: "2026",
+      desc: "Smart home devices like cameras, bulbs and sensors are easy to hack, and too small to run normal security software. I built a detector that learns what normal network traffic looks like and flags anything that doesn't fit, like a doorman who knows every regular by sight. It is under 0.1 MB, up to 700 times smaller than a typical model, and caught 89% of attacks on real smart-device traffic. Floods and break-ins are easy for it to spot; quiet scouting attacks are harder.",
+      techs: ["Python", "TensorFlow", "scikit-learn", "Autoencoder"],
+      icon: <ShieldCheck className="w-6 h-6" />,
+      image: "",
+      website: "https://github.com/esmailga/iot-sae-ids",
+      visualScreens: idsSteps
     },
     {
       title: "Samaform CMS",
@@ -624,8 +690,12 @@ export default function App() {
           <div className="flex flex-col overflow-x-clip -mx-6 px-6">
             {projects.map((project, idx) => {
               const isEven = idx % 2 === 0;
-              if (project.screens) {
-                return <ScreenTour key={idx} project={project} screens={project.screens} isEven={isEven} />;
+              const { screens, visualScreens } = project;
+              if (screens) {
+                return <ScreenTour key={idx} project={project} screens={screens} isEven={isEven} stage={(active) => <DeviceTourStage project={project} screens={screens} active={active} />} />;
+              }
+              if (visualScreens) {
+                return <ScreenTour key={idx} project={project} screens={visualScreens} isEven={isEven} stage={(active) => <CardTourStage screens={visualScreens} active={active} />} />;
               }
               return (
                 <div
@@ -633,7 +703,9 @@ export default function App() {
                   className={`flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"
                     } items-center justify-center min-h-[100vh] mt-8 md:mt-0 gap-12 md:gap-24`}
                 >
-                  {project.desktopImage ? (
+                  {project.visual ? (
+                    project.visual
+                  ) : project.desktopImage ? (
                     <DeviceStack project={project} shots={[{ desktop: project.desktopImage, mobile: project.image, label: project.title }]} />
                   ) : (
                     <PhoneFrame project={project} className="h-[480px] md:h-[667px]">
@@ -681,6 +753,12 @@ export default function App() {
                         </span>
                       ))}
                     </div>
+
+                    {project.visual && project.website && (
+                      <div className="mt-8">
+                        <CodeLink href={project.website} />
+                      </div>
+                    )}
                   </motion.div>
                 </div>
               );
