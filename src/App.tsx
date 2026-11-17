@@ -59,6 +59,7 @@ import ReactIcon from './assets/react.svg?react';
 import NodejsIcon from './assets/nodejs.svg?react';
 import { IphoneFrame, MacbookFrame } from './components/DeviceFrames';
 import { idsSteps } from './components/IdsVisual';
+import { TypewriterText } from './components/TypewriterText';
 
 const SocialsMenu = () => {
   const { scrollYProgress, scrollY } = useScroll();
@@ -594,7 +595,7 @@ export default function App() {
       <section className="h-full md:h-[85vh] flex flex-col justify-center items-center relative px-3 overflow-hidden">
         <div className="mt-16 md:mt-12 max-w-6xl w-full mx-auto relative group">
           <div className="absolute inset-4 glossy-card rounded-t-[4rem] -z-8 transition-colors duration-500 border-b-0 [mask-image:linear-gradient(to_bottom,black_40%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_40%,transparent_100%)]" />          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-0 p-8 md:py-14 px-16 items-center">
-            <div className="space-y-8 order-2 md:order-1 md:col-span-2">
+            <div className="space-y-6 order-2 md:order-1 md:col-span-2">
               <motion.div
                 style={{ y }}
                 className="relative z-10"
@@ -622,14 +623,15 @@ export default function App() {
             </div>
           </div>
           <div className="mb-18 px-12 md:px-16">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="text-[var(--muted)] text-center text-lg md:text-xl font-medium leading-[1.3] md:leading-relaxed transition-colors duration-500 tracking-wide"
-            >
-              Software developer with experience spanning full-stack web development and ERP systems with hands-on exposure to industrial power environments. One of my passions is connecting with people through my work, transforming their ideas into lasting, tangible experiences. A tenacious mentality and strong adaptability allow me to execute effectively in any environment, from fast-moving startups to structured engineering teams.
-            </motion.p>
+            <TypewriterText
+              delay={800}
+              className="text-[var(--muted)] text-left text-lg md:text-xl font-medium leading-[1.3] md:leading-relaxed transition-colors duration-500 tracking-wide whitespace-pre-line"
+              text={[
+                "Software developer experienced in full-stack web development, ERP systems, and Custom solutions.",
+                "Transforming People's ideas into lasting, tangible experiences.",
+                "Working with fast-moving startups and structured engineering teams.",
+              ].join("\n")}
+            />
           </div>
         </div>
         <div
