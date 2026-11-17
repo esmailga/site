@@ -36,6 +36,7 @@ import flexProfile from './assets/flexibleea/profile.webp';
 import flexListingForm from './assets/flexibleea/listing-form.webp';
 import flexExploreDark from './assets/flexibleea/explore-dark.webp';
 import flexAdmin from './assets/flexibleea/admin.webp';
+import wellHome from './assets/wellbooking/home.webp';
 import wellUser from './assets/wellbooking/user.webp';
 import wellAdmin from './assets/wellbooking/admin.webp';
 import wellNotifications from './assets/wellbooking/notifications.webp';
@@ -506,8 +507,9 @@ export default function App() {
       desc: "Arabic booking system for hours on a shared irrigation well, with payment-proof review and per-farm limits.",
       techs: ["PHP", "SQLite", "JavaScript"],
       icon: <Droplet className="w-6 h-6" />,
-      image: wellUser,
+      image: wellHome,
       screens: [
+        { title: "Home: weather & tips", image: wellHome, desc: "The landing page shows today's weather at the well, how much water crops need based on evaporation, an irrigation tip, and the latest farming articles, with one button to book watering hours." },
         { title: "Farmer booking", image: wellUser, desc: "Farmers pick a date and free hours for their farm, pay by bank transfer and upload a photo of the receipt. No account or password: the device remembers them." },
         { title: "Admin dashboard", image: wellAdmin, desc: "Admins sign in with two-factor codes, review payment proofs, and see today's schedule, duplicate-receipt flags and abuse alerts at a glance." },
         { title: "Phone notifications", image: wellNotifications, desc: "Each new payment proof pushes a notification to every admin's phone with the farm, date, hours and amount, and warns when a receipt image has been used before." },
