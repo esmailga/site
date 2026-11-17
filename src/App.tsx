@@ -13,7 +13,8 @@ import {
   FileText,
   Globe,
   Droplet,
-  ShieldCheck
+  ShieldCheck,
+  Sigma
 } from "lucide-react";
 
 import resume from './assets/resume.pdf';
@@ -36,6 +37,14 @@ import flexProfile from './assets/flexibleea/profile.webp';
 import flexListingForm from './assets/flexibleea/listing-form.webp';
 import flexExploreDark from './assets/flexibleea/explore-dark.webp';
 import flexAdmin from './assets/flexibleea/admin.webp';
+import rasimGraphs from './assets/rasim/graphs.webp';
+import rasimPhoneGraphs from './assets/rasim/phone-graphs.webp';
+import rasimSimCalculus from './assets/rasim/sim-calculus.webp';
+import rasimDerivativeSteps from './assets/rasim/derivative-steps.webp';
+import rasimEquationSteps from './assets/rasim/equation-steps.webp';
+import rasimSimRiemann from './assets/rasim/sim-riemann.webp';
+import rasimDarkPendulum from './assets/rasim/dark-pendulum.webp';
+import rasimSharedNote from './assets/rasim/phone-shared-note.webp';
 import wellHome from './assets/wellbooking/home.webp';
 import wellUser from './assets/wellbooking/user.webp';
 import wellAdmin from './assets/wellbooking/admin.webp';
@@ -472,6 +481,24 @@ export default function App() {
       image: shamsMobile,
       desktopImage: shamsDesktop,
       website: "https://shamss.io"
+    },
+    {
+      title: "Rasim",
+      type: "Full Stack Development",
+      year: "2026",
+      desc: "An Arabic maths and physics workbench for school and university students: plot and reshape functions, see calculus on the graph, solve equations with worked steps, and explore ten simulations, all in Arabic and right to left.",
+      techs: ["React", "Python", "FastAPI", "SymPy"],
+      icon: <Sigma className="w-6 h-6" />,
+      image: rasimPhoneGraphs,
+      desktopImage: rasimGraphs,
+      website: "https://github.com/esmailga/rasim-full",
+      screens: [
+        { title: "Graphs", image: rasimPhoneGraphs, desktopImage: rasimGraphs, desc: "An Arabic maths workbench for students. Type any function with the Arabic keypad, or drag its coloured points to reshape it while the equation rewrites itself. Tangent and area tools show the derivative and integral right on the graph." },
+        { title: "Worked steps", image: rasimDerivativeSteps, desktopImage: rasimSimCalculus, desc: "Derivatives, integrals and limits are computed exactly on a SymPy server and come back as numbered steps, one short Arabic sentence per rule: product, quotient, chain and more." },
+        { title: "Equation solver", image: rasimEquationSteps, desktopImage: rasimSimCalculus, desc: "Equations are solved step by step, from the discriminant to completing the square, and every answer is checked by substituting it back into the original equation." },
+        { title: "Simulations", image: rasimEquationSteps, desktopImage: rasimSimRiemann, desc: "Ten simulations, from Riemann sums, Newton's method and Fourier series to a pendulum, an orbit and a predator–prey model, each with sliders, its equations and a short explanation." },
+        { title: "Dark theme & sharing", image: rasimSharedNote, desktopImage: rasimDarkPendulum, desc: "A full dark theme, phone layouts and reduced-motion support. Students keep notes beside their work and share them by link, so a teacher opens the same section and equation." },
+      ]
     },
     {
       title: "IoT Intrusion Detection",
