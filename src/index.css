@@ -68,3 +68,12 @@
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+@keyframes caret-blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+.animate-caret {
+  animation: caret-blink 1s step-end infinite;
+}

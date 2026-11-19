@@ -68,7 +68,26 @@ import ReactIcon from './assets/react.svg?react';
 import NodejsIcon from './assets/nodejs.svg?react';
 import { IphoneFrame, MacbookFrame } from './components/DeviceFrames';
 import { idsSteps } from './components/IdsVisual';
-import { TypewriterText } from './components/TypewriterText';
+import { TypewriterText, type Step } from './components/TypewriterText';
+
+// The hero bio, typed out with its key phrases emphasised and a last word that changes its mind.
+const BIO_SCRIPT: Step[] = [
+  { type: "Software developer experienced in " },
+  { type: "full-stack web development", tone: "strong" },
+  { type: ", " },
+  { type: "ERP systems", tone: "strong" },
+  { type: ", and " },
+  { type: "Custom solutions", tone: "strong" },
+  { type: ".\nTransforming People's ideas into lasting, tangible " },
+  { type: "products", tone: "accent" },
+  { pause: 650 },
+  { erase: 8 },
+  { type: "platforms", tone: "accent" },
+  { pause: 650 },
+  { erase: 9 },
+  { type: "experiences", tone: "accent" },
+  { type: ".\nWorking with fast-moving startups and structured engineering teams." },
+];
 
 const SocialsMenu = () => {
   const { scrollYProgress, scrollY } = useScroll();
@@ -653,11 +672,7 @@ export default function App() {
             <TypewriterText
               delay={800}
               className="text-[var(--muted)] text-left text-lg md:text-xl font-medium leading-[1.3] md:leading-relaxed transition-colors duration-500 tracking-wide whitespace-pre-line"
-              text={[
-                "Software developer experienced in full-stack web development, ERP systems, and Custom solutions.",
-                "Transforming People's ideas into lasting, tangible experiences.",
-                "Working with fast-moving startups and structured engineering teams.",
-              ].join("\n")}
+              script={BIO_SCRIPT}
             />
           </div>
         </div>
