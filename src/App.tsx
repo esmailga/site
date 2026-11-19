@@ -551,7 +551,7 @@ export default function App() {
       title: "Well Irrigation Booking System",
       type: "Full Stack Development",
       year: "2026",
-      desc: "Arabic booking system for hours on a shared irrigation well, with payment-proof review and per-farm limits.",
+      desc: "Arabic booking system for hours on a shared irrigation well, with payment-proof review and per-farm limits. Automated routine upkeep with a cron maintenance job and built a command-line recovery tool.",
       techs: ["PHP", "SQLite", "JavaScript"],
       icon: <Droplet className="w-6 h-6" />,
       image: wellHome,
